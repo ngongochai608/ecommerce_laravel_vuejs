@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Table;
 use Illuminate\Http\Request;
-use App\Models\Brand;
 
-class BrandsController extends Controller
+class TablesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Brand::all();
+        return Table::all();
     }
 
     /**
@@ -23,43 +23,39 @@ class BrandsController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'description' => 'required|string',
-            'priority' => 'nullable|integer',
-            'status' => 'nullable|integer',
         ]);
-
-        return Brand::create($request->all());
+        return Table::create($request->all());
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Brand $brand)
+    public function show(Table $table)
     {
-        return $brand;
+        return $table;
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Brand $brand)
+    public function update(Request $request, Table $table)
     {
         $request->validate([
             'name' => 'required|string',
-            'description' => 'required|string',
-            'priority' => 'nullable|integer',
-            'status' => 'nullable|integer',
+            'status' => 'nullable|string',
         ]);
-        $brand->update($request->all());
-        return $brand;
+
+        $table->update($request->all());
+
+        return $table;
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Brand $brand)
+    public function destroy(Table $table)
     {
-        $brand->delete();
-        return reponsive()->noContent();
+        $table->delete();
+        return response()->noContent();
     }
 }

@@ -5,7 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Backend\CategoryController;
-use App\Http\Controllers\Backend\BrandController;
+use App\Http\Controllers\Backend\TableController;
 use App\Http\Controllers\Backend\ProductController;
 
 Route::get('/', function () {
@@ -26,8 +26,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('categories', CategoryController::class);
-    Route::resource('brands', BrandController::class);
+    Route::resource('tables', TableController::class);
     Route::resource('products', ProductController::class);
+    Route::get('/create-invoices', function () {
+        return Inertia::render('CreateInvoice/Index');
+    })->name('create-invoice');
 });
 
 require __DIR__.'/auth.php';

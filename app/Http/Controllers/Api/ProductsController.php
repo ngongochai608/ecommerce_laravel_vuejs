@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class ProductsController extends Controller
 {
@@ -23,18 +25,27 @@ class ProductsController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'nullable|string',
-            'galery' => 'nullable|string',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
-            'brand_id' => 'required|integer|exists:brands,id',
-            'category_id' => 'required|integer|exists:categories,id',
-            'status' => 'nullable|integer',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'priority' => 'nullable|integer',
+            'status' => 'nullable|string',
+            'price' => 'required|numeric',
+            'profit' => 'required|numeric',
+            'category_id' => 'required|integer|exists:categories,id',
         ]);
 
-        return Product::create($request->all());
+        $data = $request->except(['image']);
+
+        if ($request->hasFile('image')) {
+            $image_file = $request->file('image');
+            $image_file_extension = $image_file->getClientOriginalExtension();
+            $fileName = Str::slug($data['name']).'-'.now()->timestamp.'.'.$image_file_extension;
+            $pathFolder = 'uploads/product/'.date('d-m-Y');
+            $image_file->move(public_path($pathFolder), $fileName);
+            $filePath = asset($pathFolder . '/' . $fileName); 
+            $data['image'] = $filePath;
+        }
+
+        return Product::create($data);
     }
 
     /**
@@ -50,19 +61,46 @@ class ProductsController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'nullable|string',
-            'galery' => 'nullable|string',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
-            'brand_id' => 'required|integer|exists:brands,id',
-            'category_id' => 'required|integer|exists:categories,id',
-            'status' => 'nullable|integer',
-            'priority' => 'nullable|integer',
-        ]);
-        $product->update($request->all());
+        if ($request->hasFile('image')) {
+            $request->validate([
+                'name' => 'required|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'priority' => 'nullable|integer',
+                'status' => 'nullable|string',
+                'price' => 'required|numeric',
+                'profit' => 'required|numeric',
+                'category_id' => 'required|integer|exists:categories,id',
+            ]);
+
+            if ($category->image) {
+                $oldImagePath = public_path(str_replace(asset('/'), '', $category->image));
+                if (File::exists($oldImagePath)) {
+                    File::delete($oldImagePath);
+                }
+            }
+
+            $data = $request->except(['image']);
+
+            $image_file = $request->file('image');
+            $image_file_extension = $image_file->getClientOriginalExtension();
+            $fileName = Str::slug($data['name']).'-'.now()->timestamp.'.'.$image_file_extension;
+            $pathFolder = 'uploads/product/'.date('d-m-Y');
+            $image_file->move(public_path($pathFolder), $fileName);
+            $filePath = asset($pathFolder . '/' . $fileName); 
+            $data['image'] = $filePath;
+            $product->update($data);
+        } else {
+            $request->validate([
+                'name' => 'required|string',
+                'priority' => 'nullable|integer',
+                'status' => 'nullable|string',
+                'price' => 'required|numeric',
+                'profit' => 'required|numeric',
+                'category_id' => 'required|integer|exists:categories,id',
+                'image' => 'nullable|string',
+            ]);
+            $product->update($request->all());
+        }
         return $product;
     }
 
@@ -71,6 +109,12 @@ class ProductsController extends Controller
      */
     public function destroy(Product $product)
     {
+        if ($product->image) {
+            $imagePath = public_path(str_replace(asset('/'), '', $product->image));
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+        }
         $product->delete();
         return response()->noContent();
     }

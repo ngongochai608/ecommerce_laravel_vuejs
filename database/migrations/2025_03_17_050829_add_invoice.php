@@ -11,24 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('image')->nullable();
-            $table->integer('priority')->nullable();
-            $table->string('status')->nullable();
+            $table->string('status');
+            $table->text('items');
             $table->decimal('price', 10, 2);
-            $table->decimal('profit', 10, 2);
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->decimal('price_add', 10, 2);
+            $table->decimal('discount', 10, 2);
+            $table->decimal('total', 10, 2);
+            $table->text('note')->nullable();
+            $table->foreignId('table_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
 
     /**
      * Reverse the migrations.
-    */
+     */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('invoices');
     }
 };

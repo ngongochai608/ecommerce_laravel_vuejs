@@ -1,13 +1,13 @@
 <template>
     <div>
         <Sidebar></Sidebar>
-        <div v-if="loading" class="text-green-500 text-center">Loading Categories...</div>        
+        <div v-if="loading" class="text-green-500 text-center">Loading Tables...</div>        
         <div v-else class="p-4 sm:ml-64">
             <button @click="openModal(null)" class="flex gap-2 mb-4 mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                Add Category
+                Add Table
             </button>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 white:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 white:bg-gray-700 white:text-gray-400">
@@ -16,34 +16,22 @@
                             Name
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Priorities
-                        </th>
-                        <th scope="col" class="px-6 py-3">
-                            Status
-                        </th>
-                        <th scope="col" class="px-6 py-3">
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="bg-white border-b white:bg-gray-800 white:border-gray-700 border-gray-200"  v-for="category in categories" :key="category.id">
+                    <tr class="bg-white border-b white:bg-gray-800 white:border-gray-700 border-gray-200"  v-for="table in tables" :key="table.id">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap white:text-white">
-                            {{ category.name }}
+                            {{ table.name }}
                         </th>
                         <td class="px-6 py-4">
-                            {{ category.priority }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ category.status == 1 ? 'Publish' : 'Draff' }}
-                        </td>
-                        <td class="px-6 py-4">
-                            <button @click="openModal(category)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
+                            <button @click="openModal(table)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
                                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
                                 </svg>
                             </button>
-                            <button @click="openConfirmDelete(category.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                            <button @click="openConfirmDelete(table.id)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
                                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                 </svg>
@@ -60,7 +48,7 @@
                     <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                         <form @submit.prevent="handleSubmit">
                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Category' : 'Add Category' }}</h2>
+                                <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Table' : 'Add Table' }}</h2>
                                 <div class="grid grid-cols-1 gap-x-12 gap-y-8">
                                     <div class="sm:col-span-4">
                                         <label for="name" class="block text-sm/6 font-medium text-gray-900">Name</label>
@@ -68,28 +56,6 @@
                                             <div class="flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
                                                 <input v-model="form.name" autocomplete="off" type="text" name="name" id="name" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="sm:col-span-4">
-                                        <label for="priority" class="block text-sm/6 font-medium text-gray-900">Priority</label>
-                                        <div class="mt-2">
-                                            <select v-model="form.priority" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="0" selected>Select Priority</option>
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                                <option value="5">5</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="sm:col-span-4">
-                                        <label for="status" class="block text-sm/6 font-medium text-gray-900">Status</label>
-                                        <div class="mt-2">
-                                            <select v-model="form.status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="0" selected>Draff</option>
-                                                <option value="1">Publish</option>
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -121,7 +87,7 @@
                     </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                        <button @click="deleteCategory()" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Delete</button>
+                        <button @click="deleteTable()" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Delete</button>
                         <button @click="closeModalDelete()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
                     </div>
                 </div>
@@ -140,7 +106,7 @@
         },
         data() {
             return {
-                categories: [],
+                tables: [],
                 loading: true,
                 error: null,
                 isEditing: false,
@@ -150,37 +116,33 @@
                 form: {
                     id: null,
                     name: '',
-                    priority: null,
-                    status: null,
                 },
             }
         },
         mounted() {
-            this.fetchCategories();
+            this.fetchTables();
         },
         methods: {
-            async fetchCategories() {
+            async fetchTables() {
                 try {
-                    const reponsive = await axios.get('http://127.0.0.1:8000/api/categories');
-                    this.categories = reponsive.data;
+                    const reponsive = await axios.get('http://127.0.0.1:8000/api/tables');
+                    this.tables = reponsive.data;
                 } catch (error) {
-                    console.log('fetch categories error', error);
+                    console.log('fetch tables error', error);
                     this.error = error;
                 } finally {
                     this.loading = false;
                 }
             },
-            openModal(category) {
-                if (category) {
+            openModal(table) {
+                if (table) {
                     this.isEditing = true;
-                    this.form = {...category};
+                    this.form = {...table};
                 } else {
                     this.isEditing = false;
                     this.form = {
                         id: null,
-                        name: '',
-                        priority: null,
-                        status: null,
+                        name: ''
                     };
                 }
                 this.isOpenModal = true;
@@ -188,50 +150,50 @@
             closeModal() {
                 this.isOpenModal = false;
             },
-            async addCategory () {
+            async addTable () {
                 try {
-                    const reponsive = await axios.post('http://127.0.0.1:8000/api/categories', this.form);
-                    this.categories.push(reponsive.data);
+                    const reponsive = await axios.post('http://127.0.0.1:8000/api/tables', this.form);
+                    this.tables.push(reponsive.data);
                     this.isOpenModal = false;
                 } catch (error) {
-                    console.log('add category error', error);
+                    console.log('add tables error', error);
                 }
             },
-            async updateCategory () {
+            async updateTable () {
                 try {
-                    const reponsive = await axios.put(`http://127.0.0.1:8000/api/categories/${this.form.id}`, this.form);
-                    const index = this.categories.findIndex(category => category.id === this.form.id);
+                    const reponsive = await axios.put(`http://127.0.0.1:8000/api/tables/${this.form.id}`, this.form);
+                    const index = this.tables.findIndex(table => table.id === this.form.id);
                     if (index !== -1) {
-                        this.categories[index] = reponsive.data;
+                        this.tables[index] = reponsive.data;
                         this.isOpenModal = false;
                     }
                 } catch (error) {
-                    console.log('update category error', error);
+                    console.log('update table error', error);
                 }
             },
             async handleSubmit () {
                 if (this.isEditing) {
-                    await this.updateCategory();
+                    await this.updateTable();
                 } else {
-                    await this.addCategory();
+                    await this.addTable();
                 }
             },
-            openConfirmDelete(category_id) {
+            openConfirmDelete(table_id) {
                 this.isConfirmDelete = true;
-                this.idDelete = category_id;
+                this.idDelete = table_id;
             },
             closeModalDelete() {
                 this.isConfirmDelete = false;
                 this.idDelete = null;
             },
-            async deleteCategory() {
+            async deleteTable() {
                 try {
-                    await axios.delete(`http://127.0.0.1:8000/api/categories/${this.idDelete}`);
-                    this.categories = this.categories.filter(category => category.id !== this.idDelete);
+                    await axios.delete(`http://127.0.0.1:8000/api/tables/${this.idDelete}`);
+                    this.tables = this.tables.filter(table => table.id !== this.idDelete);
                     this.isConfirmDelete = false;
                     this.idDelete = null;
                 } catch (error) {
-                    console.log('delete category error', error);
+                    console.log('delete table error', error);
                 }
             }
         }

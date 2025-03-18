@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class CategoriesController extends Controller
 {
@@ -23,9 +25,8 @@ class CategoriesController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'description' => 'required|string',
             'priority' => 'nullable|integer',
-            'status' => 'nullable|integer',
+            'status' => 'nullable|string',
         ]);
 
         return Category::create($request->all());
@@ -46,7 +47,6 @@ class CategoriesController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'description' => 'required|string',
             'priority' => 'nullable|integer',
             'status' => 'nullable|integer',
         ]);
