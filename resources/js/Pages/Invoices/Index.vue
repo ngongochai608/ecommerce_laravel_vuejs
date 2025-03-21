@@ -1,7 +1,7 @@
 <template>
   <div>
       <Sidebar></Sidebar>
-      <div v-if="loading" class="text-green-500 text-center">Loading Invoices...</div>        
+      <div v-if="loading" class="text-green-500 text-center">Loading...</div>        
       <div v-else class="p-4 sm:ml-52">
           <Link 
               :href="route('create-invoice')" 
@@ -11,25 +11,31 @@
               <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
               </svg>
-              <span>Add Invoice</span>
+              <span>Tạo hóa đơn</span>
           </Link>
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 white:text-gray-400">
               <thead class="text-xs text-gray-700 uppercase bg-gray-50 white:bg-gray-700 white:text-gray-400">
                   <tr>
                       <th scope="col" class="px-6 py-3">
-                          Name
+                          Tên
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          Status
+                          Trạng thái
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          Date Create
+                          Ngày tạo
+                      </th>
+                        <th scope="col" class="px-6 py-3">
+                          Phương thức
+                      </th>
+                        <th scope="col" class="px-6 py-3">
+                          Kiểu mua
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          Total
+                          Tổng
                       </th>
                       <th scope="col" class="px-6 py-3">
-                          Actions
+                          Hành động
                       </th>
                   </tr>
               </thead>
@@ -43,6 +49,12 @@
                       </td>
                       <td class="px-6 py-4">
                         {{ formatDate(invoice.created_at) }}
+                      </td>
+                        <td class="px-6 py-4">
+                        {{ invoice.payment_method }}
+                      </td>
+                        <td class="px-6 py-4">
+                        {{ invoice.table_id }}
                       </td>
                       <td class="px-6 py-4">
                         {{ formatPrice(invoice.total) }}

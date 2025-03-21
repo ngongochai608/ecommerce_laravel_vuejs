@@ -13,15 +13,22 @@ class Invoice extends Model
         'status',
         'items', 
         'price',
-        'price_add', 
+        'profit', 
         'discount', 
         'total', 
         'note',
         'table_id',
+        'user_id',
+        'payment_method',
     ];
 
     public function table()
     {
         return $this->belongsTo(Table::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

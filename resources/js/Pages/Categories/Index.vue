@@ -1,28 +1,28 @@
 <template>
     <div>
         <Sidebar></Sidebar>
-        <div v-if="loading" class="text-green-500 text-center">Loading Categories...</div>        
+        <div v-if="loading" class="text-green-500 text-center">Loading...</div>        
         <div v-else class="p-4 sm:ml-52">
             <button @click="openModal(null)" class="flex gap-2 mb-4 mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                Add Category
+                Thêm danh mục
             </button>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 white:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 white:bg-gray-700 white:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3">
-                            Name
+                            Tên
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Priorities
+                            Độ ưu tiên
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Status
+                            Trạng thái
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Actions
+                            Hành động
                         </th>
                     </tr>
                 </thead>
@@ -35,7 +35,7 @@
                             {{ category.priority }}
                         </td>
                         <td class="px-6 py-4">
-                            {{ category.status == 1 ? 'Publish' : 'Draff' }}
+                            {{ category.status == 'public' ? 'Publish' : 'Draff' }}
                         </td>
                         <td class="px-6 py-4 w-[137px]">
                             <button @click="openModal(category)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
@@ -87,8 +87,8 @@
                                         <label for="status" class="block text-sm/6 font-medium text-gray-900">Status</label>
                                         <div class="mt-2">
                                             <select v-model="form.status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="0" selected>Draff</option>
-                                                <option value="1">Publish</option>
+                                                <option value="draff" selected>Draff</option>
+                                                <option value="public">Publish</option>
                                             </select>
                                         </div>
                                     </div>
@@ -179,8 +179,8 @@
                     this.form = {
                         id: null,
                         name: '',
-                        priority: null,
-                        status: null,
+                        priority: 1,
+                        status: 'public',
                     };
                 }
                 this.isOpenModal = true;

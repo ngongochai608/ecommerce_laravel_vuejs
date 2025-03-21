@@ -15,13 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('status');
+            $table->string('payment_method');
             $table->text('items');
             $table->decimal('price', 10, 0);
-            $table->decimal('price_add', 10, 0)->nullable();
+            $table->decimal('profit', 10, 0);
             $table->decimal('discount', 10, 0)->nullable();
             $table->decimal('total', 10, 0);
             $table->text('note')->nullable();
             $table->foreignId('table_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

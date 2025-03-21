@@ -7,34 +7,34 @@
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                Add Product
+                Thêm sản phẩm
             </button>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 white:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 white:bg-gray-700 white:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3">
-                            Image
+                            Hình ảnh
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Name
+                            Tên
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Priorities
+                            Độ ưu tiên
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Quantity
+                            Số lượng
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Status
+                            Trạng thái
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Price
+                            Giá
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Profit
+                            Lợi nhuận
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Actions
+                            Hành động
                         </th>
                     </tr>
                 </thead>
@@ -53,7 +53,7 @@
                             {{ product.quantity }}
                         </td>
                         <td class="px-6 py-4">
-                            {{ product.status == 1 ? 'Publish' : 'Draff' }}
+                            {{ product.status == 'public' ? 'Publish' : 'Draff' }}
                         </td>
                         <td class="px-6 py-4">
                             {{ formatPrice(product.price) }}
@@ -127,8 +127,7 @@
                                         <label for="category_id" class="block text-sm/6 font-medium text-gray-900">Category</label>
                                         <div class="mt-2">
                                             <select v-model="form.category_id" id="category_id" name="category_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="0" selected>Select Category</option>
-                                                <option v-for="category in categories" :value="category.id" :key="category.id">{{ category.name }} - ({{ category.status == 1 ? 'Publish' : 'Draff' }})</option>
+                                                <option v-for="category in categories" :value="category.id" :key="category.id">{{ category.name }} - ({{ category.status == 'public' ? 'Publish' : 'Draff' }})</option>
                                             </select>
                                         </div>
                                     </div>
@@ -136,7 +135,6 @@
                                         <label for="priority" class="block text-sm/6 font-medium text-gray-900">Priority</label>
                                         <div class="mt-2">
                                             <select v-model="form.priority" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="0" selected>Select Priority</option>
                                                 <option value="1">1</option>
                                                 <option value="2">2</option>
                                                 <option value="3">3</option>
@@ -220,6 +218,7 @@
                     price: null,
                     profit: null,
                     category_id: null,
+                    user_id: 1,
                 },
                 previewImage: '',
             }
@@ -258,6 +257,7 @@
                     this.previewImage = product.image;
                 } else {
                     this.isEditing = false;
+                    previewImage: '',
                     this.form = {
                         id: null,
                         name: '',
@@ -267,6 +267,7 @@
                         price: null,
                         profit: null,
                         category_id: null,
+                        user_id: 1,
                     };
                 }
                 this.isOpenModal = true;
@@ -277,6 +278,8 @@
             },
             async addProduct () {
                 try {
+                    this.form.price = this.form.price.replaceAll('.', '');
+                    this.form.profit = this.form.profit.replaceAll('.', '');
                     const reponsive = await axios.post('http://127.0.0.1:8000/api/products', this.form, {
                         headers: { "Content-Type": "multipart/form-data" },
                     });

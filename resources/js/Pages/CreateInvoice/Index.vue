@@ -1,12 +1,12 @@
 <template>
     <div>
         <Sidebar></Sidebar>
-        <div v-if="loading" class="text-green-500 text-center">Loading Create Invoice...</div>        
+        <div v-if="loading" class="text-green-500 text-center">Loading...</div>        
         <div class="flex h-screen sm:ml-52 bg-slate-300 p-2">
             <div class="w-3/5 p-2 bg-white rounded mr-2">
                 <div class="flex">
                     <button @click="fetchProducts()" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-gray-800 white:text-white white:border-gray-600 white:hover:bg-gray-700 white:hover:border-gray-600">
-                        All
+                        Tất cả
                     </button>
                     <button @click="filterWithCategory(category.id)" v-for="category in categories" :key="category.id" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-gray-800 white:text-white white:border-gray-600 white:hover:bg-gray-700 white:hover:border-gray-600">
                         {{ category.name }}
@@ -88,27 +88,37 @@
                 <div class="flex-1" v-if="items.length == 0">
                     <img class="mx-auto my-[50px]" src="/uploads/general/icon-food.png" alt="" width="100" height="100">
                 </div>
+                <div class="flex gap-3 justify-end">
+                    <div class="flex items-center">
+                        <input v-model="form.payment_method" id="payment_method_cash" type="radio" value="cash" name="payment_method" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 white:focus:ring-blue-600 white:ring-offset-gray-800 focus:ring-2 white:bg-gray-700 white:border-gray-600">
+                        <label for="payment_method_cash" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 white:text-gray-300">Tiền mặt</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input v-model="form.payment_method" checked id="payment_method_transfer" type="radio" value="transfer" name="payment_method" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 white:focus:ring-blue-600 white:ring-offset-gray-800 focus:ring-2 white:bg-gray-700 white:border-gray-600">
+                        <label for="payment_method_transfer" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 white:text-gray-300">Chuyển khoản</label>
+                    </div>
+                </div>
                 <div class="text-right pt-3 pb-3">
-                    <h5>Total: {{ formatPrice(invoiceTotal) }}</h5>
+                    <p class="text-xl">Total: {{ formatPrice(invoiceTotal) }}</p>
                 </div>
                 <div class="mt-auto flex justify-end">
-                    <button class="flex gap-1 justify-center items-center flex-1 text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-blue-600 white:hover:bg-blue-700">
+                    <button @click="printInvoice()" class="flex gap-1 justify-center items-center flex-1 text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-blue-600 white:hover:bg-blue-700">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M16.444 18H19a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h2.556M17 11V5a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v6h10ZM7 15h10v4a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-4Z"/>
                         </svg>
-                        Print
+                        In hóa đơn
                     </button>
-                    <button @click="saveInvoice()" class="flex gap-1 justify-center items-center flex-1 text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700">
+                    <!-- <button @click="saveInvoice('pending')" class="flex gap-1 justify-center items-center flex-1 text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01"/>
                         </svg>
                         Save
-                    </button>
-                    <button class="flex gap-1 justify-center items-center flex-1 text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700">
+                    </button> -->
+                    <button @click="paymentInvoice()" class="flex gap-1 justify-center items-center flex-1 text-white bg-purple-700 hover:bg-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-green-600 dark:hover:bg-green-700">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M8 7V6a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1M3 18v-7a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Zm8-3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
                         </svg>
-                        Payment
+                        Thanh toán
                     </button>
                 </div>
             </div>
@@ -127,12 +137,36 @@
                         </svg>
                     </div>
                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 class="text-base font-semibold text-gray-900" id="modal-title">Saved Invoice</h3>
+                        <h3 class="text-base font-semibold text-gray-900" id="modal-title">Đã lưu hóa đơn</h3>
                     </div>
                 </div>
                 </div>
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                     <button @click="closePopupSavedInvoice()" type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Ok</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div v-if="showPopupPaymentInvoice" class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-center">
+                    <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-600 sm:mx-0 sm:size-10">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-base font-semibold text-gray-900" id="modal-title">Thanh toán thành công</h3>
+                    </div>
+                </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button @click="closePopupPaymentInvoice()" type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Xong</button>
                 </div>
             </div>
             </div>
@@ -150,6 +184,7 @@
         data() {
             return {
                 showPopupSavedInvoice: false,
+                showPopupPaymentInvoice: false,
                 categories: [],
                 products: [],
                 tables: [],
@@ -164,11 +199,13 @@
                     status: '',
                     items: '',
                     price: 0,
-                    price_add: 0,
+                    profit: 0,
                     discount: 0,
                     total: 0,
                     note: '',
-                    table_id: 3
+                    table_id: 3,
+                    user_id: 1,
+                    payment_method: 'cash'
                 }
             }
         },
@@ -212,15 +249,14 @@
                     console.log('fetch filterWithCategory'. error);
                 }
             },
-            async saveInvoice () {
+            async saveInvoice (status) {
                 try {
                     if (this.items.length > 0) {
                         this.form.name = Date.now().toString().slice(-6);
-                        this.form.status = 'pending';
+                        this.form.status = status;
                         this.form.items = JSON.stringify(this.items);
                         this.form.price = this.invoiceTotal;
                         this.form.total = this.invoiceTotal;
-                        console.log(this.form)
                         const reponsive = await axios.post('http://127.0.0.1:8000/api/invoices', this.form);
                         this.showPopupSavedInvoice = true;
                     } else {
@@ -231,7 +267,7 @@
                 }
             },
             formatPrice (number) {
-                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + 'đ';
+                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             },
             handleIncrement (product) {
                 const hasItem = this.items.find(item => item.id == product.id);
@@ -313,6 +349,63 @@
             },
             closePopupSavedInvoice () {
                 this.showPopupSavedInvoice = false;
+            },
+            printInvoice () {
+                const date = new Date().toLocaleDateString('vi-VN').split('-').reverse().join('-');
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const formattedTime = `${hours}h${minutes}`;
+                let itemsPrint = '';
+                this.items.forEach(e => {
+                    itemsPrint += `
+                        <tr>
+                            <td>${e.name}<br />${this.formatPrice(e.price)}</td>
+                            <td>${e.qty}</td>
+                            <td>${this.formatPrice(e.total)}</td>
+                        </tr>
+                    `;
+                });
+                let printWindow = window.open('', '', 'width=58mm,height=auto');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>In hóa đơn</title>
+                        <style>
+                        @page { size: 58mm auto; margin: 0; }
+                        body { width: 58mm; margin: 0; padding: 0; font-size: 14px; text-align: center; }
+                        </style>
+                    </head>
+                    <body>
+                        <h3>Bánh Tráng Hương Trà</h3>
+                        <p>Ngày: ${date}</p>
+                        <p>Giờ: ${formattedTime}</p>
+                        <table>
+                            <tr>
+                                <td>Đơn giá</td>
+                                <td>SL</td>
+                                <td>T.Tiền</td>
+                            </tr>
+                            ${itemsPrint}
+                        </table>
+                        <br />
+                        <h3 style="text-align: right;">Tổng tiền: ${this.formatPrice(this.invoiceTotal)}</h3>
+                        <br />
+                        <p style="text-align: center;">Cảm ơn và hẹn gặp lại quý khách!</p>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+                printWindow.close();
+            },
+            paymentInvoice () {
+                this.printInvoice();
+                this.saveInvoice('done');
+                this.showPopupPaymentInvoice = true;
+            },
+            closePopupPaymentInvoice () {
+                this.showPopupPaymentInvoice = false;
             }
         }
     }

@@ -25,12 +25,14 @@ class InvoicesController extends Controller
             'name' => 'required|string',
             'status' => 'required|string',
             'items' => 'required|string',
+            'payment_method' => 'required|string',
             'price' => 'required|numeric',
-            'price_add' => 'nullable|numeric',
+            'profit' => 'nullable|numeric',
             'discount' => 'nullable|numeric',
             'total' => 'required|numeric',
             'note' => 'nullable|string',
             'table_id' => 'required|integer|exists:tables,id',
+            'user_id' => 'nullable|integer|exists:users,id',
         ]);
         return Invoice::create($request->all());
     }

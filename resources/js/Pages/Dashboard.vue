@@ -15,22 +15,6 @@
                 <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Đơn đã bán hôm nay</h5>
                 <p class="font-normal text-gray-700 white:text-gray-400">50</p>
             </div>
-            <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 white:bg-gray-800 white:border-gray-700 white:hover:bg-gray-700">
-                <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Tiền nhận vào</h5>
-                <p class="font-normal text-gray-700 white:text-gray-400">7.000.000đ</p>
-            </div>
-            <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 white:bg-gray-800 white:border-gray-700 white:hover:bg-gray-700">
-                <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Tiền chi ra</h5>
-                <p class="font-normal text-gray-700 white:text-gray-400">2.000.000đ</p>
-            </div>
-            <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 white:bg-gray-800 white:border-gray-700 white:hover:bg-gray-700">
-                <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Doanh số tháng này</h5>
-                <p class="font-normal text-gray-700 white:text-gray-400">100.000.000đ</p>
-            </div>
-            <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 white:bg-gray-800 white:border-gray-700 white:hover:bg-gray-700">
-                <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Lợi nhuận tháng này tháng này</h5>
-                <p class="font-normal text-gray-700 white:text-gray-400">100.000.000đ</p>
-            </div>
         </div>
         <h3 class="p-4 pb-0 sm:ml-52 text-2xl font-bold tracking-tight text-gray-900 white:text-white">Kho</h3>
         <div class="gap-4 p-4 sm:ml-52">
@@ -64,7 +48,7 @@
                                 {{ product.price }}
                             </td>
                             <td class="px-6 py-4">
-                                {{ product.category }}
+                                {{ product.category_id }}
                             </td>
                         </tr>
                     </tbody>
@@ -93,6 +77,17 @@
             async fetchProducts() {
                 try {
                     const reponsive = await axios.get('http://127.0.0.1:8000/api/products');
+                    this.products = reponsive.data;
+                } catch (error) {
+                    console.log('fetch products error', error);
+                    this.error = error;
+                } finally {
+                    this.loading = false;
+                }
+            },
+            async fetchTotalInvoicesToday() {
+                try {
+                    const reponsive = await axios.get('http://127.0.0.1:8000/api/invoices');
                     this.products = reponsive.data;
                 } catch (error) {
                     console.log('fetch products error', error);

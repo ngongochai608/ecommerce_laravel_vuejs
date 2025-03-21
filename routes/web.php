@@ -32,9 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('tables', TableController::class);
     Route::resource('products', ProductController::class);
-    Route::get('invoices', function () {
-        return Inertia::render('Invoices/Index');
-    })->name('invoices');
+    Route::resource('invoices', InvoiceController::class);
     Route::get('/users', function () {
         return Inertia::render('Users/Index');
     })->name('users');
