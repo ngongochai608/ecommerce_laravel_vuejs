@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('status');
             $table->text('items');
-            $table->decimal('price', 10, 2);
-            $table->decimal('price_add', 10, 2);
-            $table->decimal('discount', 10, 2);
-            $table->decimal('total', 10, 2);
+            $table->decimal('price', 10, 0);
+            $table->decimal('price_add', 10, 0)->nullable();
+            $table->decimal('discount', 10, 0)->nullable();
+            $table->decimal('total', 10, 0);
             $table->text('note')->nullable();
             $table->foreignId('table_id')->constrained()->onDelete('cascade');
             $table->timestamps();

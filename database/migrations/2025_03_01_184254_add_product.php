@@ -16,9 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->integer('priority')->nullable();
+            $table->integer('quantity');
             $table->string('status')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->decimal('profit', 10, 2);
+            $table->decimal('price', 10, 0);
+            $table->decimal('profit', 10, 0);
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

@@ -13,9 +13,14 @@ class ProductsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Product::all();
+        if ($request->has('category_id')) {
+            $products = Product::where('category_id', $request->category_id)->get();
+        } else {
+            $products = Product::all();
+        }
+        return $products;
     }
 
     /**
@@ -27,6 +32,7 @@ class ProductsController extends Controller
             'name' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'priority' => 'nullable|integer',
+            'quantity' => 'required|integer',
             'status' => 'nullable|string',
             'price' => 'required|numeric',
             'profit' => 'required|numeric',

@@ -2,7 +2,7 @@
     <div>
         <Sidebar></Sidebar>
         <div v-if="loading" class="text-green-500 text-center">Loading Products...</div>        
-        <div v-else class="p-4 sm:ml-64">
+        <div v-else class="p-4 sm:ml-52">
             <button @click="openModal(null)" class="flex gap-2 mb-4 mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
@@ -20,6 +20,9 @@
                         </th>
                         <th scope="col" class="px-6 py-3">
                             Priorities
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Quantity
                         </th>
                         <th scope="col" class="px-6 py-3">
                             Status
@@ -47,6 +50,9 @@
                             {{ product.priority }}
                         </td>
                         <td class="px-6 py-4">
+                            {{ product.quantity }}
+                        </td>
+                        <td class="px-6 py-4">
                             {{ product.status == 1 ? 'Publish' : 'Draff' }}
                         </td>
                         <td class="px-6 py-4">
@@ -55,7 +61,7 @@
                         <td class="px-6 py-4">
                             {{ formatPrice(product.profit) }}
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 w-[137px]">
                             <button @click="openModal(product)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
                                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
@@ -92,7 +98,7 @@
                                         <label for="price" class="block text-sm/6 font-medium text-gray-900">Price</label>
                                         <div class="mt-2">
                                             <div class="flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-                                                <input v-model="form.price" autocomplete="off" type="text" name="price" id="price" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
+                                                <input v-model="form.price" @input="formatCurrency" autocomplete="off" type="text" name="price" id="price" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +106,15 @@
                                         <label for="profit" class="block text-sm/6 font-medium text-gray-900">Profit</label>
                                         <div class="mt-2">
                                             <div class="flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-                                                <input v-model="form.profit" autocomplete="off" type="text" name="profit" id="profit" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
+                                                <input v-model="form.profit" @input="formatCurrency" autocomplete="off" type="text" name="profit" id="profit" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="sm:col-span-4">
+                                        <label for="quantity" class="block text-sm/6 font-medium text-gray-900">Quantity</label>
+                                        <div class="mt-2">
+                                            <div class="flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
+                                                <input v-model="form.quantity" autocomplete="off" type="number" name="quantity" id="quantity" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
                                             </div>
                                         </div>
                                     </div>
@@ -135,8 +149,8 @@
                                         <label for="status" class="block text-sm/6 font-medium text-gray-900">Status</label>
                                         <div class="mt-2">
                                             <select v-model="form.status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="0" selected>Draff</option>
-                                                <option value="1">Publish</option>
+                                                <option value="draff" selected>Draff</option>
+                                                <option value="public">Publish</option>
                                             </select>
                                         </div>
                                     </div>
@@ -200,8 +214,9 @@
                     id: null,
                     name: '',
                     image: '',
-                    priority: null,
-                    status: null,
+                    priority: 1,
+                    quantity: null,
+                    status: 'public',
                     price: null,
                     profit: null,
                     category_id: null,
@@ -247,8 +262,8 @@
                         id: null,
                         name: '',
                         image: '',
-                        priority: null,
-                        status: null,
+                        priority: 1,
+                        status: 'public',
                         price: null,
                         profit: null,
                         category_id: null,
@@ -273,6 +288,8 @@
             },
             async updateProduct () {
                 try {
+                    this.form.price = this.form.price.replaceAll('.', '');
+                    this.form.profit = this.form.profit.replaceAll('.', '');
                     const reponsive = await axios.patch(`http://127.0.0.1:8000/api/products/${this.form.id}`, this.form);
                     const index = this.products.findIndex(product => product.id === this.form.id);
                     if (index !== -1) {
@@ -318,6 +335,15 @@
                     this.previewImage = URL.createObjectURL(file);
                 }
             },
+            formatCurrency(event) {
+                const valCurrent = event.target.value.replaceAll('.', '');
+                if (event.target.name == 'price') {
+                    this.form.price = new Intl.NumberFormat("vi-VN").format(valCurrent);
+                }
+                if (event.target.name == 'profit') {
+                    this.form.profit = new Intl.NumberFormat("vi-VN").format(valCurrent);
+                }
+            }
         }
     }
 </script>
