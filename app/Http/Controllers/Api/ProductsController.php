@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\HistoryWarehouse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
@@ -18,7 +19,7 @@ class ProductsController extends Controller
         if ($request->has('category_id')) {
             $products = Product::where('category_id', $request->category_id)->get();
         } else {
-            $products = Product::all();
+            $products = Product::orderBy('quantity', 'asc')->get();
         }
         return $products;
     }
@@ -96,15 +97,15 @@ class ProductsController extends Controller
             $data['image'] = $filePath;
             $product->update($data);
         } else {
-            $request->validate([
-                'name' => 'required|string',
-                'priority' => 'nullable|integer',
-                'status' => 'nullable|string',
-                'price' => 'required|numeric',
-                'profit' => 'required|numeric',
-                'category_id' => 'required|integer|exists:categories,id',
-                'image' => 'nullable|string',
-            ]);
+            // $request->validate([
+            //     'name' => 'required|string',
+            //     'priority' => 'nullable|integer',
+            //     'status' => 'nullable|string',
+            //     'price' => 'required|numeric',
+            //     'profit' => 'required|numeric',
+            //     'category_id' => 'required|integer|exists:categories,id',
+            //     'image' => 'nullable|string',
+            // ]);
             $product->update($request->all());
         }
         return $product;
@@ -123,5 +124,17 @@ class ProductsController extends Controller
         }
         $product->delete();
         return response()->noContent();
+    }
+
+    public function addHistoryWarehouse (Request $request) {
+        $request->validate([
+            'name' => 'required|string',
+            'quantity' => 'required|integer',
+        ]);
+        HistoryWarehouse::create($request->all());
+    }
+
+    public function getHistoryWarehouse () {
+        return HistoryWarehouse::latest()->get();
     }
 }

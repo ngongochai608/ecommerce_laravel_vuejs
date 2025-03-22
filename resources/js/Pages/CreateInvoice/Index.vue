@@ -95,6 +95,9 @@
                     <img class="mx-auto my-[50px]" src="/uploads/general/icon-food.png" alt="" width="100" height="100">
                 </div>
                 <div class="flex gap-3 justify-end">
+                    <p>Tổng sản phẩm: {{ countItems }}</p>
+                </div>
+                <div class="flex gap-3 justify-end">
                     <div class="flex items-center">
                         <input v-model="form.payment_method" id="payment_method_cash" type="radio" value="cash" name="payment_method" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 white:focus:ring-blue-600 white:ring-offset-gray-800 focus:ring-2 white:bg-gray-700 white:border-gray-600">
                         <label for="payment_method_cash" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 white:text-gray-300">Tiền mặt</label>
@@ -105,7 +108,7 @@
                     </div>
                 </div>
                 <div class="text-right pt-3 pb-3">
-                    <p class="text-xl">Total: {{ formatPrice(invoiceTotal) }}</p>
+                    <p class="text-xl">Tổng tiền: {{ formatPrice(invoiceTotal) }}</p>
                 </div>
                 <div class="mt-auto flex justify-end">
                     <button @click="printInvoice()" class="flex gap-1 justify-center items-center flex-1 text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-blue-600 white:hover:bg-blue-700">
@@ -195,6 +198,7 @@
                 products: [],
                 tables: [],
                 items: [],
+                countItems: 0,
                 showChoseQtyItem: {
                     id: 0,
                     qty: 0,
@@ -226,54 +230,49 @@
                 try {
                     const botToken = "7449740160:AAGA--rO8-9-6h9krB2RT68uJlxMBjQsuUA";
                     const chatId = "6010493676";
-                    let message = `Hoá đơn mới!\n`;
-                    this.items.forEach(e => {
-                        message += `${e.name} | ${e.qty}\n`;
-                    });
-                    message += `Thanh toán: ${this.payment_method == 'cash' ? 'tiền mặt' : 'chuyển khoản'}\n`;
-                    message += `Tổng giá: ${this.invoiceTotal}`;
+                    let message = `Bạn vừa tạo một đơn hàng mới có giá là ${this.invoiceTotal}\n, thanh toán là ${this.payment_method == 'cash' ? 'tiền mặt' : 'chuyển khoản'}`;
                     const response = await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`,{
                         chat_id: chatId,
                         text: message
                     });
                 } catch (error) {
-                    console.log('send notification'. error);
+                    console.log('send notification error'. error);
                 }
             },
             async fetchCategories () {
                 try {
-                    const response = await axios.get('http://127.0.0.1:8000/api/categories');
+                    const response = await axios.get('/api/categories');
                     this.categories = response.data;
                 } catch (error) {
-                    console.log('fetch categories'. error);
+                    console.log('fetch categories error'. error);
                 }
             },
             async fetchProducts () {
                 try {
                     this.tabCategoryCurrent = 0;
-                    const response = await axios.get('http://127.0.0.1:8000/api/products');
+                    const response = await axios.get('/api/products');
                     this.products = response.data;
                 } catch (error) {
-                    console.log('fetch product'. error);
+                    console.log('fetch product error'. error);
                 }
             },
             async fetchTables () {
                 try {
-                    const response = await axios.get('http://127.0.0.1:8000/api/tables');
+                    const response = await axios.get('/api/tables');
                     this.tables = response.data;
                 } catch (error) {
-                    console.log('fetch table'. error);
+                    console.log('fetch table error'. error);
                 }
             },
             async filterWithCategory (category_id) {
                 this.tabCategoryCurrent = category_id;
                 try {
-                    const response = await axios.get('http://127.0.0.1:8000/api/products', {
+                    const response = await axios.get('/api/products', {
                         params: { category_id: category_id }
                     });
                     this.products = response.data;
                 } catch (error) {
-                    console.log('fetch filterWithCategory'. error);
+                    console.log('fetch filterWithCategory error'. error);
                 }
             },
             async saveInvoice (status) {
@@ -284,14 +283,11 @@
                         this.form.items = JSON.stringify(this.items);
                         this.form.price = this.invoiceTotal;
                         this.form.total = this.invoiceTotal;
-                        console.log(this.form)
-                        const reponsive = await axios.post('http://127.0.0.1:8000/api/invoices', this.form);
+                        const reponsive = await axios.post('/api/invoices', this.form);
                         this.showPopupSavedInvoice = true;
-                    } else {
-                        console.log('reject save invoice')
                     }
                 } catch (error) {
-                    console.log('add invoice error', error);
+                    console.log('save invoice error', error);
                 }
             },
             formatPrice (number) {
@@ -359,6 +355,7 @@
             },
             caculateInvoiceTotal () {
                 this.invoiceTotal = this.items.reduce((accumulator, currentValue) => accumulator + (currentValue.price * currentValue.qty), 0);
+                this.countItems = this.items.reduce((accumulator, currentValue) => accumulator + currentValue.qty, 0);
             },
             handleInputQtyItem (event, product) {
                 const value = Number(event.target.value);

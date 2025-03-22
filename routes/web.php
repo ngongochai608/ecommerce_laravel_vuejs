@@ -9,6 +9,7 @@ use App\Http\Controllers\Backend\TableController;
 use App\Http\Controllers\Backend\ProductController;
 use App\Http\Controllers\Backend\InvoiceController;
 use App\Http\Controllers\Backend\UserController;
+use App\Http\Controllers\Backend\WarehouseController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -33,12 +34,19 @@ Route::middleware('auth')->group(function () {
     Route::resource('tables', TableController::class);
     Route::resource('products', ProductController::class);
     Route::resource('invoices', InvoiceController::class);
+    Route::get('/warehouse', function () {
+        return Inertia::render('Warehouse/Index');
+    })->name('warehouse');
     Route::get('/users', function () {
         return Inertia::render('Users/Index');
     })->name('users');
     Route::get('/create-invoices', function () {
         return Inertia::render('CreateInvoice/Index');
     })->name('create-invoice');
+
+    Route::get('/test-auth', function () {
+        return auth()->user()->id;
+    });
 });
 
 require __DIR__.'/auth.php';

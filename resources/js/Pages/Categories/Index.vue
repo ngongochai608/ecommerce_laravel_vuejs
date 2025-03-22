@@ -35,7 +35,7 @@
                             {{ category.priority }}
                         </td>
                         <td class="px-6 py-4">
-                            {{ category.status == 'public' ? 'Publish' : 'Draff' }}
+                            {{ category.status == 'public' ? 'Kích hoạt' : 'Chưa kích hoạt' }}
                         </td>
                         <td class="px-6 py-4 w-[137px]">
                             <button @click="openModal(category)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
@@ -60,10 +60,10 @@
                     <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                         <form @submit.prevent="handleSubmit">
                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Category' : 'Add Category' }}</h2>
+                                <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Sửa danh mục' : 'Thêm danh mục' }}</h2>
                                 <div class="grid grid-cols-1 gap-x-12 gap-y-8">
                                     <div class="sm:col-span-4">
-                                        <label for="name" class="block text-sm/6 font-medium text-gray-900">Name</label>
+                                        <label for="name" class="block text-sm/6 font-medium text-gray-900">Tên danh mục</label>
                                         <div class="mt-2">
                                             <div class="flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
                                                 <input v-model="form.name" autocomplete="off" type="text" name="name" id="name" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
@@ -71,10 +71,9 @@
                                         </div>
                                     </div>
                                     <div class="sm:col-span-4">
-                                        <label for="priority" class="block text-sm/6 font-medium text-gray-900">Priority</label>
+                                        <label for="priority" class="block text-sm/6 font-medium text-gray-900">Độ ưu tiên</label>
                                         <div class="mt-2">
                                             <select v-model="form.priority" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="0" selected>Select Priority</option>
                                                 <option value="1">1</option>
                                                 <option value="2">2</option>
                                                 <option value="3">3</option>
@@ -84,19 +83,19 @@
                                         </div>
                                     </div>
                                     <div class="sm:col-span-4">
-                                        <label for="status" class="block text-sm/6 font-medium text-gray-900">Status</label>
+                                        <label for="status" class="block text-sm/6 font-medium text-gray-900">Trạng thái</label>
                                         <div class="mt-2">
                                             <select v-model="form.status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 light:bg-gray-700 light:border-gray-600 light:placeholder-gray-400 light:text-white light:focus:ring-blue-500 light:focus:border-blue-500">
-                                                <option value="draff" selected>Draff</option>
-                                                <option value="public">Publish</option>
+                                                <option value="draff" selected>Ẩn</option>
+                                                <option value="public">Kích hoạt</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                <button type="submit" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Save</button>
-                                <button @click="closeModal()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                                <button type="submit" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Lưu</button>
+                                <button @click="closeModal()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Hủy</button>
                             </div>
                         </form>
                     </div>
@@ -161,7 +160,7 @@
         methods: {
             async fetchCategories() {
                 try {
-                    const reponsive = await axios.get('http://127.0.0.1:8000/api/categories');
+                    const reponsive = await axios.get('/api/categories');
                     this.categories = reponsive.data;
                 } catch (error) {
                     console.log('fetch categories error', error);
@@ -190,7 +189,7 @@
             },
             async addCategory () {
                 try {
-                    const reponsive = await axios.post('http://127.0.0.1:8000/api/categories', this.form);
+                    const reponsive = await axios.post('/api/categories', this.form);
                     this.categories.push(reponsive.data);
                     this.isOpenModal = false;
                 } catch (error) {
@@ -199,7 +198,7 @@
             },
             async updateCategory () {
                 try {
-                    const reponsive = await axios.put(`http://127.0.0.1:8000/api/categories/${this.form.id}`, this.form);
+                    const reponsive = await axios.put(`/api/categories/${this.form.id}`, this.form);
                     const index = this.categories.findIndex(category => category.id === this.form.id);
                     if (index !== -1) {
                         this.categories[index] = reponsive.data;
@@ -226,7 +225,7 @@
             },
             async deleteCategory() {
                 try {
-                    await axios.delete(`http://127.0.0.1:8000/api/categories/${this.idDelete}`);
+                    await axios.delete(`/api/categories/${this.idDelete}`);
                     this.categories = this.categories.filter(category => category.id !== this.idDelete);
                     this.isConfirmDelete = false;
                     this.idDelete = null;

@@ -66,10 +66,10 @@
                   <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                       <form @submit.prevent="handleSubmit">
                           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                              <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Edit Table' : 'Add Table' }}</h2>
+                              <h2 class="text-xl font-semibold mb-4">{{ isEditing ? 'Sửa tài khoản' : 'Thêm tài khoản' }}</h2>
                               <div class="grid grid-cols-1 gap-x-12 gap-y-8">
                                     <div class="sm:col-span-4">
-                                        <label for="name" class="block text-sm/6 font-medium text-gray-900">Name</label>
+                                        <label for="name" class="block text-sm/6 font-medium text-gray-900">Tên tài khoản</label>
                                         <div class="mt-2">
                                             <div class="flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
                                                 <input v-model="form.name" autocomplete="off" type="text" name="name" id="name" class="rounded-lg block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6">
@@ -113,8 +113,8 @@
                               </div>
                           </div>
                           <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                              <button type="submit" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Save</button>
-                              <button @click="closeModal()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                              <button type="submit" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Lưu</button>
+                              <button @click="closeModal()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Hủy</button>
                           </div>
                       </form>
                   </div>
@@ -180,8 +180,7 @@
     methods: {
         async fetchUsers () {
             try {
-            const response = await axios.get('http://127.0.0.1:8000/api/users');
-            console.log(response.data)
+            const response = await axios.get('/api/users');
             this.users = response.data;
             this.loading = false;
             } catch (error) {
@@ -192,7 +191,6 @@
             if (user) {
                 this.isEditing = true;
                 this.form = {...user};
-                console.log(this.form)
             } else {
                 this.isEditing = false;
                 this.form = {
@@ -210,8 +208,7 @@
         },
         async editUser (userId) {
             try {
-                console.log(this.form)
-                const reponsive = await axios.get(`http://127.0.0.1:8000/api/users/${userId}`);
+                const reponsive = await axios.get(`/api/users/${userId}`);
                 this.users.push(reponsive.data);
                 this.isOpenModal = false;
             } catch (error) {
@@ -220,8 +217,7 @@
         },
         async addUser () {
             try {
-                console.log(this.form)
-                const reponsive = await axios.post('http://127.0.0.1:8000/api/users', this.form);
+                const reponsive = await axios.post('/api/users', this.form);
                 this.users.push(reponsive.data);
                 this.isOpenModal = false;
             } catch (error) {
@@ -230,7 +226,7 @@
         },
         async updateCategory () {
             try {
-                const reponsive = await axios.put(`http://127.0.0.1:8000/api/categories/${this.form.id}`, this.form);
+                const reponsive = await axios.put(`/api/categories/${this.form.id}`, this.form);
                 const index = this.categories.findIndex(category => category.id === this.form.id);
                 if (index !== -1) {
                     this.categories[index] = reponsive.data;
@@ -257,7 +253,7 @@
         },
         async deleteUser() {
             try {
-                await axios.delete(`http://127.0.0.1:8000/api/users/${this.idDelete}`);
+                await axios.delete(`/api/users/${this.idDelete}`);
                 this.users = this.users.filter(user => user.id !== this.idDelete);
                 this.isConfirmDelete = false;
                 this.idDelete = null;

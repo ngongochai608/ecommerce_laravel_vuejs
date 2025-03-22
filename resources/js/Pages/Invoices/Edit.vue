@@ -167,7 +167,7 @@
         },
         async fetchCategories () {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/categories');
+                const response = await axios.get('/api/categories');
                 this.categories = response.data;
             } catch (error) {
                 console.log('fetch categories'. error);
@@ -175,7 +175,7 @@
         },
         async fetchProducts () {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/products');
+                const response = await axios.get('/api/products');
                 this.products = response.data;
             } catch (error) {
                 console.log('fetch product'. error);
@@ -183,7 +183,7 @@
         },
         async fetchTables () {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/tables');
+                const response = await axios.get('/api/tables');
                 this.tables = response.data;
             } catch (error) {
                 console.log('fetch table'. error);
@@ -191,7 +191,7 @@
         },
         async filterWithCategory (category_id) {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/products', {
+                const response = await axios.get('/api/products', {
                     params: { category_id: category_id }
                 });
                 this.products = response.data;
@@ -208,7 +208,7 @@
                     this.form.price = this.invoiceTotal;
                     this.form.total = this.invoiceTotal;
                     console.log(this.form)
-                    const reponsive = await axios.post('http://127.0.0.1:8000/api/invoices', this.form);
+                    const reponsive = await axios.post('/api/invoices', this.form);
                     console.log('update invoice');
                 } else {
                     console.log('reject save invoice')

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
+use App\Models\Product;
+use Illuminate\Support\Carbon;
 
 class InvoicesController extends Controller
 {
@@ -13,7 +15,7 @@ class InvoicesController extends Controller
      */
     public function index()
     {
-        return Invoice::all();
+        return Invoice::latest()->get();;
     }
 
     /**
@@ -34,7 +36,22 @@ class InvoicesController extends Controller
             'table_id' => 'required|integer|exists:tables,id',
             'user_id' => 'nullable|integer|exists:users,id',
         ]);
-        return Invoice::create($request->all());
+
+        $items = json_decode($request->items, true);
+
+        $profit = 0;
+        foreach ($items as $item) {
+            $product = Product::find($item['id']);
+            $product->quantity -= $item['qty'];
+            $product->save();
+
+            $profit += $product->profit * $item['qty'];
+        }
+
+        $invoiceData = $request->all();
+        $invoiceData['profit'] = $profit;
+
+        return Invoice::create($invoiceData);
     }
 
     /**
@@ -60,5 +77,29 @@ class InvoicesController extends Controller
     {
         $invoice->delete();
         return response()->noContent();
+    }
+
+    public function statistical (Request $request) {
+        $date = $request->date;
+        $invoices = Invoice::whereDate('created_at', $date)->get();
+        $sale = 0;
+        $profit = 0;
+        $count = 0;
+        foreach ($invoices as $invoice) {
+            $count++;
+            $items = json_decode($invoice->items, true);
+            foreach($items as $item) {
+                $product = Product::find($item['id']);
+                $sale += $product->price * $item['qty'];
+                $profit += $product->profit * $item['qty'];
+            }
+        }
+
+        $data = [
+            'sale' => $sale,
+            'profit' => $profit,
+            'count' => $count,
+        ];
+        return response()->json($data);
     }
 }

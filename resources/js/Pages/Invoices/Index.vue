@@ -34,9 +34,9 @@
                       <th scope="col" class="px-6 py-3">
                           Tổng
                       </th>
-                      <th scope="col" class="px-6 py-3">
+                      <!-- <th scope="col" class="px-6 py-3">
                           Hành động
-                      </th>
+                      </th> -->
                   </tr>
               </thead>
               <tbody>
@@ -45,21 +45,21 @@
                         {{ invoice.name }}
                       </th>
                       <td class="px-6 py-4">
-                        {{ invoice.status }}
+                        {{ invoice.status == 'done' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
                       </td>
                       <td class="px-6 py-4">
                         {{ formatDate(invoice.created_at) }}
                       </td>
                         <td class="px-6 py-4">
-                        {{ invoice.payment_method }}
+                        {{ invoice.payment_method == 'cash' ? 'Tiền mặt' : 'Chuyển khoản' }}
                       </td>
                         <td class="px-6 py-4">
-                        {{ invoice.table_id }}
+                        {{ this.tables[invoice.table_id].name }}
                       </td>
                       <td class="px-6 py-4">
                         {{ formatPrice(invoice.total) }}
                       </td>
-                      <td class="px-6 py-4 w-[137px]">
+                      <!-- <td class="px-6 py-4 w-[137px]">
                             <Link 
                                 :href="route('invoices.show', invoice.id)" 
                                 class="inline-flex bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2" 
@@ -74,7 +74,7 @@
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                 </svg>
                             </button>
-                      </td>
+                      </td> -->
                   </tr>
               </tbody>
           </table>
@@ -92,13 +92,13 @@
                       </svg>
                       </div>
                       <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                          <h3 class="text-base font-semibold text-gray-900" id="modal-title">Confirm Delete</h3>
+                          <h3 class="text-base font-semibold text-gray-900" id="modal-title">Xác nhận xóa</h3>
                       </div>
                   </div>
                   </div>
                   <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                      <button @click="deleteInvoice()" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Delete</button>
-                      <button @click="closeModalDelete()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                      <button @click="deleteInvoice()" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Xóa</button>
+                      <button @click="closeModalDelete()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Hủy</button>
                   </div>
               </div>
               </div>
@@ -119,6 +119,7 @@
       data() {
           return {
               invoices: [],
+              tables: [],
               loading: true,
               error: null,
               isConfirmDelete: false,
@@ -126,12 +127,13 @@
           }
       },
       mounted() {
+          this.fetchTables();
           this.fetchInvoices();
       },
       methods: {
           async fetchInvoices() {
               try {
-                  const reponsive = await axios.get('http://127.0.0.1:8000/api/invoices');
+                  const reponsive = await axios.get('/api/invoices');
                   this.invoices = reponsive.data;
               } catch (error) {
                   console.log('fetch invoices error', error);
@@ -140,6 +142,20 @@
                   this.loading = false;
               }
           },
+            async fetchTables() {
+                try {
+                    const reponsive = await axios.get('/api/tables');
+                    this.tables = reponsive.data.reduce((acc, item) => {
+                        acc[item.id] = item;
+                        return acc;
+                    }, {});
+                } catch (error) {
+                    console.log('fetch tables error', error);
+                    this.error = error;
+                } finally {
+                    this.loading = false;
+                }
+            },
           openConfirmDelete(invoice_id) {
               this.isConfirmDelete = true;
               this.idDelete = invoice_id;
@@ -150,7 +166,7 @@
           },
           async deleteInvoice() {
               try {
-                  await axios.delete(`http://127.0.0.1:8000/api/invoices/${this.idDelete}`);
+                  await axios.delete(`/api/invoices/${this.idDelete}`);
                   this.invoices = this.invoices.filter(product => product.id !== this.idDelete);
                   this.isConfirmDelete = false;
                   this.idDelete = null;
@@ -159,7 +175,7 @@
               }
           },
           formatPrice(price) {
-            return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
           },
           formatDate(date) {
             const dateFormat = new Date(date);
