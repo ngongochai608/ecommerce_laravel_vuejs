@@ -5,15 +5,21 @@
         <div class="flex h-screen sm:ml-52 bg-slate-300 p-2">
             <div class="w-3/5 p-2 bg-white rounded mr-2">
                 <div class="flex">
-                    <button @click="fetchProducts()" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-gray-800 white:text-white white:border-gray-600 white:hover:bg-gray-700 white:hover:border-gray-600">
+                    <button @click="fetchProducts()" :class="[
+                            tabCategoryCurrent == 0 ? 'text-white bg-blue-700' : 'text-gray-900 bg-white', 
+                            'border border-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-gray-800 white:text-white white:border-gray-600'
+                        ]">
                         Tất cả
                     </button>
-                    <button @click="filterWithCategory(category.id)" v-for="category in categories" :key="category.id" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-gray-800 white:text-white white:border-gray-600 white:hover:bg-gray-700 white:hover:border-gray-600">
+                    <button @click="filterWithCategory(category.id)" v-for="category in categories" :key="category.id" :class="[
+                            tabCategoryCurrent == category.id ? 'text-white bg-blue-700' : 'text-gray-900 bg-white', 
+                            'border border-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 white:bg-gray-800 white:text-white white:border-gray-600'
+                        ]">
                         {{ category.name }}
                     </button>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <div class="relative" v-for="product in products" @click="choseItem(product.id)" :key="product.id">
+                    <div class="relative" v-for="product in products" @click="choseItem(product)" :key="product.id">
                         <img class="h-[150px] w-full max-w-full rounded-lg object-cover" :src="product.image" alt="">
                         <h3 class="absolute left-0 bottom-0 text-white bg-zinc-700/80 py-1 px-2 w-full">{{ product.name }}</h3>
                         <span class="absolute top-0 right-0 p-1 text-white bg-red-800">{{ formatPrice(product.price) }}</span>
@@ -124,7 +130,7 @@
             </div>
         </div>
     </div>
-    <div v-if="showPopupSavedInvoice" class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- <div v-if="showPopupSavedInvoice" class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
@@ -147,7 +153,7 @@
             </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <div v-if="showPopupPaymentInvoice" class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -194,6 +200,7 @@
                     qty: 0,
                 },
                 invoiceTotal: 0,
+                tabCategoryCurrent: 0,
                 form: {
                     name: '',
                     status: '',
@@ -215,6 +222,24 @@
             this.fetchTables();
         },
         methods: {
+            async senNotification () {
+                try {
+                    const botToken = "7449740160:AAGA--rO8-9-6h9krB2RT68uJlxMBjQsuUA";
+                    const chatId = "6010493676";
+                    let message = `Hoá đơn mới!\n`;
+                    this.items.forEach(e => {
+                        message += `${e.name} | ${e.qty}\n`;
+                    });
+                    message += `Thanh toán: ${this.payment_method == 'cash' ? 'tiền mặt' : 'chuyển khoản'}\n`;
+                    message += `Tổng giá: ${this.invoiceTotal}`;
+                    const response = await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`,{
+                        chat_id: chatId,
+                        text: message
+                    });
+                } catch (error) {
+                    console.log('send notification'. error);
+                }
+            },
             async fetchCategories () {
                 try {
                     const response = await axios.get('http://127.0.0.1:8000/api/categories');
@@ -225,6 +250,7 @@
             },
             async fetchProducts () {
                 try {
+                    this.tabCategoryCurrent = 0;
                     const response = await axios.get('http://127.0.0.1:8000/api/products');
                     this.products = response.data;
                 } catch (error) {
@@ -240,6 +266,7 @@
                 }
             },
             async filterWithCategory (category_id) {
+                this.tabCategoryCurrent = category_id;
                 try {
                     const response = await axios.get('http://127.0.0.1:8000/api/products', {
                         params: { category_id: category_id }
@@ -257,6 +284,7 @@
                         this.form.items = JSON.stringify(this.items);
                         this.form.price = this.invoiceTotal;
                         this.form.total = this.invoiceTotal;
+                        console.log(this.form)
                         const reponsive = await axios.post('http://127.0.0.1:8000/api/invoices', this.form);
                         this.showPopupSavedInvoice = true;
                     } else {
@@ -306,14 +334,22 @@
                 }
                 this.caculateInvoiceTotal();
             },
-            choseItem (productId) {
-                let hasItem = this.items.find(item => item.id == productId);
+            choseItem (product) {
+                let hasItem = this.items.find(item => item.id == product.id);
                 if (hasItem) {
                     this.showChoseQtyItem.id = hasItem.id;
                     this.showChoseQtyItem.qty = hasItem.qty;
                 } else {
-                    this.showChoseQtyItem.id = productId;
-                    this.showChoseQtyItem.qty = 0;
+                    this.showChoseQtyItem.id = product.id;
+                    this.showChoseQtyItem.qty = 1;
+                    this.items.push({
+                        id: product.id,
+                        qty: 1,
+                        name: product.name,
+                        price: product.price,
+                        total: product.price
+                    });
+                    this.caculateInvoiceTotal();
                 }
             },
             remoteItem (productId) {
@@ -402,6 +438,7 @@
             paymentInvoice () {
                 this.printInvoice();
                 this.saveInvoice('done');
+                this.senNotification();
                 this.showPopupPaymentInvoice = true;
             },
             closePopupPaymentInvoice () {

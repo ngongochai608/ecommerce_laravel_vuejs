@@ -285,6 +285,7 @@
                     });
                     this.products.push(reponsive.data);
                     this.isOpenModal = false;
+                    this.previewImage = '';
                 } catch (error) {
                     console.log('add products error', error);
                 }
@@ -329,7 +330,7 @@
                 }
             },
             formatPrice(price) {
-                return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             },
             handleImageUpload(event) {
                 const file = event.target.files[0];

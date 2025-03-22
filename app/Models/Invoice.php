@@ -12,6 +12,7 @@ class Invoice extends Model
         'name', 
         'status',
         'items', 
+        'payment_method',
         'price',
         'profit', 
         'discount', 
@@ -19,7 +20,6 @@ class Invoice extends Model
         'note',
         'table_id',
         'user_id',
-        'payment_method',
     ];
 
     public function table()
