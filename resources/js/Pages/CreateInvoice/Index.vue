@@ -230,7 +230,7 @@
                 try {
                     const botToken = "7449740160:AAGA--rO8-9-6h9krB2RT68uJlxMBjQsuUA";
                     const chatId = "6010493676";
-                    let message = `Bạn vừa tạo một đơn hàng mới có giá là ${this.invoiceTotal}\n, thanh toán là ${this.payment_method == 'cash' ? 'tiền mặt' : 'chuyển khoản'}`;
+                    let message = `Bạn vừa tạo một đơn hàng mới có giá: ${this.invoiceTotal}\n, phương thức thanh toán: ${this.payment_method == 'cash' ? 'tiền mặt' : 'chuyển khoản'}`;
                     const response = await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`,{
                         chat_id: chatId,
                         text: message
