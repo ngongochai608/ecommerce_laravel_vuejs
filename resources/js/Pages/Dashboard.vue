@@ -18,6 +18,14 @@
                 <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Đơn đã bán hôm nay</h5>
                 <p class="font-normal text-gray-700 white:text-gray-400">{{ countInvoice }}</p>
             </div>
+            <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 white:bg-gray-800 white:border-gray-700 white:hover:bg-gray-700">
+                <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Tiền mặt</h5>
+                <p class="font-normal text-gray-700 white:text-gray-400">{{ formatPrice(cash) }}đ</p>
+            </div>
+            <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 white:bg-gray-800 white:border-gray-700 white:hover:bg-gray-700">
+                <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 white:text-white">Chuyển khoản</h5>
+                <p class="font-normal text-gray-700 white:text-gray-400">{{ formatPrice(transfer) }}đ</p>
+            </div>
         </div>
         <h3 class="p-4 pb-0 sm:ml-52 text-2xl font-bold tracking-tight text-gray-900 white:text-white">Kho</h3>
         <div class="gap-4 p-4 sm:ml-52">
@@ -75,6 +83,8 @@
                 sale: 0,
                 profit: 0,
                 countInvoice: 0,
+                cash: 0,
+                transfer: 0,
             }
         },
         mounted () {
@@ -102,6 +112,8 @@
                     this.profit = reponsive.data.profit;
                     this.sale = reponsive.data.sale;
                     this.countInvoice = reponsive.data.count;
+                    this.cash = reponsive.data.cash;
+                    this.transfer = reponsive.data.transfer;
                 } catch (error) {
                     console.log('fetch products error', error);
                     this.error = error;

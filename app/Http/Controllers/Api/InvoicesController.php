@@ -85,6 +85,8 @@ class InvoicesController extends Controller
         $sale = 0;
         $profit = 0;
         $count = 0;
+        $cash = 0;
+        $transfer = 0;
         foreach ($invoices as $invoice) {
             $count++;
             $items = json_decode($invoice->items, true);
@@ -93,12 +95,20 @@ class InvoicesController extends Controller
                 $sale += $product->price * $item['qty'];
                 $profit += $product->profit * $item['qty'];
             }
+            if ($invoice->payment_method == 'cash') {
+                $cash += (int)$invoice->total;
+            }
+            if ($invoice->payment_method == 'transfer') {
+                $transfer += (int)$invoice->total;
+            }
         }
 
         $data = [
             'sale' => $sale,
             'profit' => $profit,
             'count' => $count,
+            'cash' => $cash,
+            'transfer' => $transfer
         ];
         return response()->json($data);
     }
